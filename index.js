@@ -23,6 +23,9 @@ const client = new MongoClient(uri, {
   }
 });
 
+// collections
+const userCollection = client.db('petuk-palace').collection('users')
+
 
 const dbConnect = async() =>{
     try{
@@ -30,10 +33,16 @@ const dbConnect = async() =>{
         console.log('Db connect');
 
     // Routes 
-    // app.get('/users', async( req , res ) => {
-        
-    // })
-
+    app.post('/user', async( req , res ) => {
+        const user = req.body
+        const result = await userCollection.insertOne(user)
+        res.send(result)
+    })
+    
+    app.get('/users' , async( req, res ) =>{
+        const allUser = await userCollection.find().toArray()
+        res.send(allUser)
+    })
 
 
     }
