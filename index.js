@@ -3,10 +3,8 @@ const cors = require('cors');
 const app = express();
 require('dotenv').config()
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
-// 6XG1yMCTrTh0g0v1
-// petuk_DB
 
 // middleware
 app.use(cors())
@@ -25,6 +23,7 @@ const client = new MongoClient(uri, {
 
 // collections
 const userCollection = client.db('petuk-palace').collection('users')
+const cartCollection = client.db('petuk-palace').collection('cartItem')
 
 
 const dbConnect = async() =>{
@@ -35,6 +34,11 @@ const dbConnect = async() =>{
     // Routes 
     app.post('/user', async( req , res ) => {
         const user = req.body
+        const query = { email : user.email}
+        const existingUser = await userCollection.findOne(query)
+        if(existingUser){
+            return res.send({message :'User already exists'})
+        }
         const result = await userCollection.insertOne(user)
         res.send(result)
     })
@@ -43,6 +47,39 @@ const dbConnect = async() =>{
         const allUser = await userCollection.find().toArray()
         res.send(allUser)
     })
+    
+    app.get('/users/:email', async( req, res ) => {
+        const query = { email: req.params.email}
+        const user = await userCollection.findOne(query)
+        res.send(user)
+    })
+
+
+    // cart 
+    app.post('/cart' , async( req , res ) =>{
+        const item = req.body
+        const result = await cartCollection.insertOne(item)
+        res.send(result)
+    })
+
+    app.get('/cart/:email' , async( req , res) =>{
+        const email =  req.params.email
+        const query = {userEmail : email}
+        const items = await cartCollection.find(query).toArray()
+        res.send(items)
+    })
+
+    // remove items 
+    app.delete('/deleteItem/:id' , async( req, res) =>{
+        const id = req.params.id
+        console.log(id);
+        const query = { _id : new ObjectId(id)}
+        const result = await cartCollection.deleteOne(query)
+        res.send(result)
+    })
+
+
+
 
 
     }
