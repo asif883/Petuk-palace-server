@@ -23,7 +23,9 @@ const client = new MongoClient(uri, {
 
 // collections
 const userCollection = client.db('petuk-palace').collection('users')
-const cartCollection = client.db('petuk-palace').collection('cartItem')
+const cartCollection = client.db('petuk-palace').collection('cartItem');
+const orderCollection = client.db('petuk-palace').collection('orders')
+const menuCollection = client.db('petuk-palace').collection('menu')
 
 
 const dbConnect = async() =>{
@@ -72,12 +74,55 @@ const dbConnect = async() =>{
     // remove items 
     app.delete('/deleteItem/:id' , async( req, res) =>{
         const id = req.params.id
-        console.log(id);
         const query = { _id : new ObjectId(id)}
         const result = await cartCollection.deleteOne(query)
         res.send(result)
     })
 
+    app.delete('/deleteItems/:email' , async( req, res) =>{
+        const email = req.params.email
+        const query = { userEmail: email}
+        const result = await cartCollection.deleteMany(query)
+        res.send(result)
+    })
+
+    // orders
+    app.post('/orders' , async( req , res ) =>{
+        const order = req.body
+        const result = await orderCollection.insertOne(order)
+        res.send(result)
+    })
+
+    app.get('/allOrder' , async( req , res ) =>{
+        const orders = await orderCollection.find().toArray()
+        res.send(orders)
+    })
+
+    app.get('/orders/:email', async(req ,res) =>{
+        const email = req.params.email
+        const query = { userEmail: email}
+        const result = await orderCollection.find(query).toArray()
+        res.send(result)
+    })
+
+    app.delete('/delete/:id' , async( req, res) =>{
+        const id = req.params.id
+        const query = { _id : new ObjectId(id)}
+        const result = await orderCollection.deleteOne(query)
+        res.send(result)
+    })
+   
+    // add menu
+    app.post('/add-menu', async (req, res) => {
+    const newItem = req.body;
+    const result = await menuCollection.insertOne(newItem);
+    res.send(result);
+    });
+
+    app.get('/menu', async( req, res )=> {
+        const menu = await menuCollection.find().toArray()
+        res.send(menu)
+    })
 
 
 
