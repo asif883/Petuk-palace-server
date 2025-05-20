@@ -7,7 +7,13 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 // middleware
-app.use(cors())
+app.use(cors({
+    origin:[ 
+      'http://localhost:5173',
+      "https://petuk-palace.web.app"
+    ],
+    optionsSuccessStatus: 200
+  }))
 app.use(express.json())
 
 
@@ -30,8 +36,8 @@ const menuCollection = client.db('petuk-palace').collection('menu')
 
 const dbConnect = async() =>{
     try{
-        await client.connect()
-        console.log('Db connect');
+        // await client.connect()
+        // console.log('Db connect');
 
     // Routes 
     app.post('/user', async( req , res ) => {
