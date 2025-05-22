@@ -156,7 +156,7 @@ const dbConnect = async() =>{
     res.send(result);
     });
 
-    app.get('/menu',verifyAdmin, async( req, res )=> {
+    app.get('/menu', async( req, res )=> {
         const menu = await menuCollection.find().toArray()
         res.send(menu)
     })
